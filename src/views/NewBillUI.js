@@ -31,7 +31,7 @@ export default () => {
                   </div>
                   <div class="col-half">
                     <label for="datepicker" class="bold-label">Date</label>
-                    <input required type="date" class="form-control blue-border" data-testid="datepicker" />
+                    <input type="date" class="form-control blue-border" data-testid="datepicker" />
                   </div>
                   <div class="col-half">
                     <label for="amount" class="bold-label">Montant TTC </label>

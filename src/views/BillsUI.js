@@ -20,7 +20,26 @@ const row = (bill) => {
   }
 
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+/*
+* Corrigé le 09/06/2022, ticket Bills [BUG REPORT]
+*/
+
+  // return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+  // console.log(data)
+  /* SI il n'y a pas de data, on return */
+  if(!data){
+    return
+  }
+  /* Sinon SI il y 'a data, on regarde si il a une length */
+  else if(data.length){
+    let sortedByDate = [...data].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Fonction ' New Date ' qui sanitize en date numérique 
+    return sortedByDate.map(bill => row(bill)).join("");
+  }
+  /* SInon, si il n'y a pas de data.length, on return */
+  else{
+      return
+  }
+
 }
 
 export default ({ data: bills, loading, error }) => {

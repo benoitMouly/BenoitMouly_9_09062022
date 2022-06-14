@@ -13,18 +13,42 @@ export default class NewBill {
     this.fileUrl = null
     this.fileName = null
     this.billId = null
+  /*
+  * Corrigé le 11/06/202; ticket Bills [BUG REPORT]
+  **/
+    // On set le disabler à true, on part du principe que le fichier est bon.
+    this.disabler = true;
+
+    this.valueInput = this.document.querySelector(`input[data-testid="file"]`).value
+
     new Logout({ document, localStorage, onNavigate })
   }
+
+
   handleChangeFile = e => {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
+    const isValidPath = filePath[2] // Récupération du 3è elt du tableau, qui est le nom du fichier avec son extension.
+
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i; // Création de la regex
+
+
+    if (!allowedExtensions.exec(isValidPath)) { // Execution de la regex, disabler passe à false
+      this.valueInput = '';
+      console.log('MAUVAIS');
+      console.log(this.valueInput)
+      console.log('----------')
+      this.disabler = false
+      return
+    }
+    this.disabler = true;
+    if(this.disabler){ // Si disabler est true, on créé le formulaire
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
-
     this.store
       .bills()
       .create({
@@ -34,14 +58,27 @@ export default class NewBill {
         }
       })
       .then(({fileUrl, key}) => {
+
         console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName
       }).catch(error => console.error(error))
+    
   }
+}
+
   handleSubmit = e => {
     e.preventDefault()
+
+    if(!this.disabler){ // Si disabler est faux, alors on vide l'input, et on return pour ne pas envoyer la requête
+      let $inputFile = this.document.querySelector(`input[data-testid="file"]`) // On re-récupère l'élément input puis on le vide avec null
+      $inputFile.value = null;
+      return
+    }
+
+    console.log(this.fileUrl)
+
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
@@ -57,11 +94,14 @@ export default class NewBill {
       fileName: this.fileName,
       status: 'pending'
     }
+    console.log(bill.fileName)
+
     this.updateBill(bill)
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
   // not need to cover this function by tests
+  /* istanbul ignore next */
   updateBill = (bill) => {
     if (this.store) {
       this.store

@@ -86,7 +86,14 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
+    // console.log(bill)
+    /*
+    * Corrigé le 11/06/2022, ticket Dashboard [BUG HUNT]
+    **/
+    e.stopImmediatePropagation() // Le soucis était donc du BUBBLING, donc stopImmediatePropagation règle le problème.
+    // SI this counter est indéfini OU que this.id est différent de bill.id , this.counter reviens à 0
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
+    // SI this counter est indéfini ou que this id est différent de bill id, alors l'id est égale a bill id
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {
       bills.forEach(b => {
@@ -96,6 +103,9 @@ export default class {
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
       this.counter ++
+      // console.log('*** dans le IF, this.counter ****')
+      // console.log(this.counter)
+      // console.log('******')
     } else {
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
@@ -103,7 +113,11 @@ export default class {
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
-      this.counter ++
+      this.counter ++;
+      // console.log('*** dans le ELSE, this.counter ****')
+      // console.log(this.counter)
+      // console.log('******')
+      e.preventDefault()
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
